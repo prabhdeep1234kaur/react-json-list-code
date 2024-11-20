@@ -1,23 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import Form from "./Form";
+import Table from "./Table";
 
 function App() {
+
+  const API_URL = 'https://jsonplaceholder.typicode.com/'
+
+  const [reqType, setReqType] = useState('users');
+  const [items, setItems] = useState([]); 
+
+  useEffect(()=>{
+
+    const fetchItems = async () => {
+      try{
+        const response = await fetch( `${API_URL}${reqType}`); //reqType : users, comments or posts
+        if(!response.ok) throw Error('Did not receive expected data');      
+        const data = await response.json();
+        console.log(data);
+        setItems(data);
+      }catch(err){
+        console.log(err.message);
+      }
+    }
+
+    fetchItems();
+
+  }, [reqType]) //for load time: anytime the request type is changed
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+     <Form reqType={reqType} setReqType={setReqType} />
+     {/* {<List items={items} />} */}
+     <Table items={items}/>
     </div>
   );
 }
